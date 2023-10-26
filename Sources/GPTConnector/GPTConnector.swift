@@ -68,7 +68,7 @@ public struct GPTConnector {
     ) async throws -> [Message] {
         
         let result = try await connector
-            .send(chatData: context.chatData)
+            .send(chatData: context.chatData, numberOfChoices: self.numberOfChoices)
         
         return result.choices.map { $0.message.message }
     }

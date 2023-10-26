@@ -30,7 +30,7 @@ final class GPTConnectorTests: XCTestCase {
                 usage: .init(total_tokens: 100)
             )
         }
-        sut = GPTConnector(apiKey: "test", connector: apiConnectorMock)
+        sut = GPTConnector(apiKey: "test", numberOfChoices: 2, connector: apiConnectorMock)
         
         let initialChat = Chat(
             messages: [
@@ -46,6 +46,7 @@ final class GPTConnectorTests: XCTestCase {
         XCTAssertEqual(result[0].messages.count, 2)
         XCTAssertEqual(result[0].messages[1].content, "hello!")
         XCTAssertEqual(result[1].messages[1].content, "hi!")
+        XCTAssertEqual(apiConnectorMock.lastNumberOfChoicesCall, 2)
     }
     
     func testShouldFunctionCallWithResult_firstChoice() async throws {

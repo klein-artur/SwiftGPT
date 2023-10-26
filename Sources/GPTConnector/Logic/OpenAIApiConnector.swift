@@ -101,14 +101,23 @@ class OpenAIApiConnector {
         self.session = session
     }
     
-    public func send(chatData: ChatData) async throws -> ChatResult {
+    public func send(chatData: ChatData, numberOfChoices: Int) async throws -> ChatResult {
         let url = URL(string: baseUrl)!
         var request = URLRequest(url: url)
         request.httpMethod = "POST"
         request.setValue("Bearer \(apiKey)", forHTTPHeaderField: "Authorization")
         
         let encoder = JSONEncoder()
-        request.httpBody = try encoder.encode(chatData)
+        
+        let jsonData = try encoder.encode(chatData)
+        
+        if var jsonDict = try JSONSerialization.jsonObject(with: jsonData, options: .mutableContainers) as? [String: Any] {
+            
+            jsonDict["n"] = numberOfChoices
+            
+            let newJsonData = try JSONSerialization.data(withJSONObject: jsonDict, options: [])
+            request.httpBody = newJsonData
+        }
         
         let (data, _) = try await session.data(for: request)
         
