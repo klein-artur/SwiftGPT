@@ -121,6 +121,7 @@ If `numberOfChoices` was set to more than one, you also might want to pass the p
 chat(
     context: initialChat,
     onChoiceSelect: { messages, currentContext in
+        /// currentContext is the Chat at the moment the choice needs to be done.
         return messages[2]
     },
     onFunctionCall: { functionName, arguments in
