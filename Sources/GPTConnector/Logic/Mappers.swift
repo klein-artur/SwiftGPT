@@ -24,7 +24,7 @@ extension Chat {
             model: self.model,
             temperature: self.temperature,
             messages: messages.messageDatas,
-            functions: functions.functionDatas,
+            functions: functions.isEmpty ? nil : functions.functionDatas,
             function_call: functionCall
         )
     }

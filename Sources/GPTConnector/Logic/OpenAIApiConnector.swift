@@ -106,6 +106,7 @@ class OpenAIApiConnector {
         var request = URLRequest(url: url)
         request.httpMethod = "POST"
         request.setValue("Bearer \(apiKey)", forHTTPHeaderField: "Authorization")
+        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
         
         let encoder = JSONEncoder()
         
@@ -118,6 +119,7 @@ class OpenAIApiConnector {
             let newJsonData = try JSONSerialization.data(withJSONObject: jsonDict, options: [])
             request.httpBody = newJsonData
         }
+        
         
         let (data, _) = try await session.data(for: request)
         

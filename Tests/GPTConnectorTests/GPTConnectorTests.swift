@@ -35,6 +35,32 @@ final class GPTConnectorTests: XCTestCase {
         let initialChat = Chat(
             messages: [
                 .system("Test Message")
+            ],
+            functions: [
+                Function(
+                    name: "some_function",
+                    description: "The description for the model.",
+                    parameters: [
+                        Function.Property(
+                            name: "property_name",
+                            type: .boolean,
+                            description: "The description of the parameter.",
+                            required: true
+                        ),
+                        Function.Property(
+                            name: "property_name",
+                            type: .integer,
+                            description: "The description of the parameter.",
+                            required: false
+                        ),
+                        Function.Property(
+                            name: "property_name",
+                            type: .string,
+                            description: "The description of the parameter.",
+                            required: true
+                        )
+                    ]
+                )
             ]
         )
         

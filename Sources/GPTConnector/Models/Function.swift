@@ -9,11 +9,26 @@ import Foundation
 
 public class Function: BaseModel, Codable {
     
+    /// The name of the function
     public var name: String
+    
+    /// The description of the function provided to the model.
     public var description: String
+    
+    /// The type of the function. Default is object.
     public var type: String = "object"
+    
+    /// The parameters of the function.
     public var parameters: [Property]
     
+    /// Creates a new function.
+    /// - Parameters:
+    /// - name: The name of the function
+    /// - description: The description of the function provided to the model.
+    /// - type: The type of the function. Default is object.
+    /// - parameters: The parameters of the function.
+    /// - id: The id of the function. If not provided, it will be generated.
+    /// - Returns: A new function.
     public init(
         id: String? = nil,
         name: String,
@@ -39,11 +54,24 @@ public class Function: BaseModel, Codable {
             case integer
         }
         
+        /// The name of the parameter.
         public var name: String
+        
+        /// The type of the parameter.
         public var type: ParamType
+        
+        /// The description of the parameter.
         public var description: String
+        
+        /// If the parameter is required.
         public var required: Bool
         
+        /// Creates a new parameter.
+        /// - Parameters:
+        /// - name: The name of the parameter.
+        /// - type: The type of the parameter.
+        /// - description: The description of the parameter.
+        /// - required: If the parameter is required.
         public init(
             id: String? = nil,
             name: String,
