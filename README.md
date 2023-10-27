@@ -50,12 +50,14 @@ currentChat = connector.chat(context: currentChat).first!
 The `Chat` is the basic instance you will work on. It is the given context window for the model and also the return value. So you can iteratively work on the chat model.
 The model has some default values, so usually you just have to fill it with messages.
 
+```
 Parameters:
 model: String = "gpt-4",
 messages: [Message],
 temperature: Float = 0.7,
 functions: [Function] = [],
 functionCall: FunctionCallInstruction = .auto
+```
 
 By default the context will be using the model GPT4 but you can use any chat model OpenAI is providing.
 
