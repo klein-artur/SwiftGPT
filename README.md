@@ -103,30 +103,13 @@ In this example we pass three functions to the model. If it decides to call a fu
 
 ```swift
 
-var currentChat = Chat(
-    messages: [
-        .system("You are a helpful assistant.")
-    ],
-    functions: [
-        Function(
-            name: "some_function",
-            description: "The description for the model.",
-            parameters: [
-                Function.Property(
-                    name: "property_name",
-                    type: .boolean,
-                    description: "The description of the parameter.",
-                    required: true
-                )
-            ]
-        )
-    ]
-)
-
 currentChat = connector.chat(
     context: currentChat,
     onFunctionCall: { functionName, arguments in
-        return "the result"
+        switch functionName {
+        case "some_function": return "some function result"
+        default: throw .functionNotKnown
+        }
     }
 ).first!
 
