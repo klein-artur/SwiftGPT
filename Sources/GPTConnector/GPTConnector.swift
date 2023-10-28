@@ -1,14 +1,42 @@
 import Foundation
 
+public enum GPTConnectorError: Error {
+    case noFunctionHandling
+}
+
+public protocol GPTConnectorProtocol {
+    
+    /// Chat with the OpenAI API Chat completion.
+    /// - Parameters:
+    ///  - context: The context to start the chat with which is just a chat by itself.
+    ///  - onChoiceSelect: A closure to select the one of the choices that the api returns. This is only used when a function call or another action
+    ///     is received that is not the final chat answer. The chat answer will return all choices as chat variants.
+    ///     The default implementation will always select the first choice.
+    ///  - onFunctionCall: A closure to handle function calls. The default implementation will throw an error. So if your context offers functions and the
+    ///           the model decides to use one, better have this implemented to answer to the function call. The model might get angry and take over the world.
+    ///           Don't say I didn't warn you!
+    func chat(
+        context: Chat,
+        onChoiceSelect: @escaping (([Message], Chat) -> Message),
+        onFunctionCall: @escaping ((String, String) async throws -> String)
+    ) async throws -> [Chat]
+}
+
+public extension GPTConnectorProtocol {
+    func chat(
+        context: Chat,
+        onChoiceSelect: @escaping (([Message], Chat) -> Message) = { (choices, _) in choices[0] },
+        onFunctionCall: @escaping ((String, String) async throws -> String) = { (_, _) in throw GPTConnectorError.noFunctionHandling }
+    ) async throws -> [Chat] {
+        return try await self.chat(context: context, onChoiceSelect: onChoiceSelect, onFunctionCall: onFunctionCall)
+    }
+}
+
 /// A connector to the OpenAI API Chat completion.
 public struct GPTConnector {
     private let apiKey: String
     private let numberOfChoices: Int
     private let connector: OpenAIApiConnector
-    
-    public enum ConnectorError: Error {
-        case noFunctionHandling
-    }
 
     /// Creates a new connector to the OpenAI API Chat completion.
     /// - Parameters:
@@ -26,19 +54,10 @@ public struct GPTConnector {
         self.connector = connector
     }
     
-    /// Chat with the OpenAI API Chat completion.
-    /// - Parameters:
-    ///  - context: The context to start the chat with which is just a chat by itself.
-    ///  - onChoiceSelect: A closure to select the one of the choices that the api returns. This is only used when a function call or another action
-    ///     is received that is not the final chat answer. The chat answer will return all choices as chat variants.
-    ///     The default implementation will always select the first choice.
-    ///  - onFunctionCall: A closure to handle function calls. The default implementation will throw an error. So if your context offers functions and the
-    ///           the model decides to use one, better have this implemented to answer to the function call. The model might get angry and take over the world.
-    ///           Don't say I didn't warn you!
     public func chat(
         context: Chat,
         onChoiceSelect: @escaping (([Message], Chat) -> Message) = { (choices, _) in choices[0] },
-        onFunctionCall: @escaping ((String, String) async throws -> String) = { (_, _) in throw ConnectorError.noFunctionHandling }
+        onFunctionCall: @escaping ((String, String) async throws -> String) = { (_, _) in throw GPTConnectorError.noFunctionHandling }
     ) async throws -> [Chat] {
         
         var context = context

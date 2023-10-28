@@ -185,7 +185,7 @@ final class GPTConnectorTests: XCTestCase {
             _ = try await sut.chat(context: inputChat)
             XCTFail("Should have thrown error")
         } catch {
-            XCTAssertEqual(error as? GPTConnector.ConnectorError, .noFunctionHandling)
+            XCTAssertEqual(error as? GPTConnectorError, .noFunctionHandling)
         }
     }
     
