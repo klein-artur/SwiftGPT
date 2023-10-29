@@ -35,8 +35,19 @@ public extension GPTConnector {
     }
 }
 
+public enum GPTConnectorFactory {
+    
+    /// Creates a new connector to the OpenAI API Chat completion.
+    /// - Parameters:
+    ///  - apiKey: The API key to use for the requests. It's an optional, but you have to sat it before the first chat call.
+    ///  - numberOfChoices: The number of choices to return. Defaults to 1.
+    public static func create(apiKey: String? = nil, numberOfChoices: Int = 1) -> any GPTConnector {
+        DefaultGPTConnector(apiKey: apiKey, numberOfChoices: numberOfChoices)
+    }
+}
+
 /// A connector to the OpenAI API Chat completion.
-public struct DefaultGPTConnector: GPTConnector {
+struct DefaultGPTConnector: GPTConnector {
     public var apiKey: String? {
         didSet {
             connector.apiKey = apiKey
@@ -44,12 +55,8 @@ public struct DefaultGPTConnector: GPTConnector {
     }
     private let numberOfChoices: Int
     private let connector: OpenAIApiConnector
-
-    /// Creates a new connector to the OpenAI API Chat completion.
-    /// - Parameters:
-    ///  - apiKey: The API key to use for the requests. It's an optional, but you have to sat it before the first chat call.
-    ///  - numberOfChoices: The number of choices to return. Defaults to 1.
-    public init(apiKey: String? = nil, numberOfChoices: Int = 1) {
+    
+    init(apiKey: String? = nil, numberOfChoices: Int = 1) {
         self.apiKey = apiKey
         self.numberOfChoices = numberOfChoices
         self.connector = OpenAIApiConnector(apiKey: apiKey, session: .shared)
