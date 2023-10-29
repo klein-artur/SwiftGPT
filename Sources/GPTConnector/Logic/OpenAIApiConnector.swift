@@ -9,6 +9,10 @@ import Foundation
 
 class OpenAIApiConnector {
     
+    enum OpenAIApiConnectorError: Error {
+        case apiKeyMissing
+    }
+    
     struct ChatResult: Codable {
         let choices: [
             Choice
@@ -91,17 +95,21 @@ class OpenAIApiConnector {
         }
     }
     
-    private let apiKey: String
+    var apiKey: String?
     private let baseUrl: String = "https://api.openai.com/v1/chat/completions"
     
     private var session: URLSession
     
-    init(apiKey: String, session: URLSession) {
+    init(apiKey: String?, session: URLSession) {
         self.apiKey = apiKey
         self.session = session
     }
     
     public func send(chatData: ChatData, numberOfChoices: Int) async throws -> ChatResult {
+        guard let apiKey else {
+            throw OpenAIApiConnectorError.apiKeyMissing
+        }
+        
         let url = URL(string: baseUrl)!
         var request = URLRequest(url: url)
         request.httpMethod = "POST"

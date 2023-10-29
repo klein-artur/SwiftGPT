@@ -2,9 +2,12 @@ import Foundation
 
 public enum GPTConnectorError: Error {
     case noFunctionHandling
+    case apiKeyMissing
 }
 
 public protocol GPTConnectorProtocol {
+    
+    var apiKey: String? { get set }
     
     /// Chat with the OpenAI API Chat completion.
     /// - Parameters:
@@ -33,22 +36,26 @@ public extension GPTConnectorProtocol {
 }
 
 /// A connector to the OpenAI API Chat completion.
-public struct GPTConnector {
-    private let apiKey: String
+public struct GPTConnector: GPTConnectorProtocol {
+    public var apiKey: String? {
+        didSet {
+            connector.apiKey = apiKey
+        }
+    }
     private let numberOfChoices: Int
     private let connector: OpenAIApiConnector
 
     /// Creates a new connector to the OpenAI API Chat completion.
     /// - Parameters:
-    ///  - apiKey: The API key to use for the requests.
+    ///  - apiKey: The API key to use for the requests. It's an optional, but you have to sat it before the first chat call.
     ///  - numberOfChoices: The number of choices to return. Defaults to 1.
-    public init(apiKey: String, numberOfChoices: Int = 1) {
+    public init(apiKey: String? = nil, numberOfChoices: Int = 1) {
         self.apiKey = apiKey
         self.numberOfChoices = numberOfChoices
         self.connector = OpenAIApiConnector(apiKey: apiKey, session: .shared)
     }
     
-    init(apiKey: String, numberOfChoices: Int = 1, connector: OpenAIApiConnector) {
+    init(apiKey: String? = nil, numberOfChoices: Int = 1, connector: OpenAIApiConnector) {
         self.apiKey = apiKey
         self.numberOfChoices = numberOfChoices
         self.connector = connector
@@ -59,6 +66,10 @@ public struct GPTConnector {
         onChoiceSelect: @escaping (([Message], Chat) -> Message) = { (choices, _) in choices[0] },
         onFunctionCall: @escaping ((String, String) async throws -> String) = { (_, _) in throw GPTConnectorError.noFunctionHandling }
     ) async throws -> [Chat] {
+        
+        guard apiKey != nil else {
+            throw GPTConnectorError.apiKeyMissing
+        }
         
         var context = context
         
