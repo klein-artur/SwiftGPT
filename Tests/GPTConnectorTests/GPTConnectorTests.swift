@@ -30,7 +30,7 @@ final class GPTConnectorTests: XCTestCase {
                 usage: .init(total_tokens: 100)
             )
         }
-        sut = GPTConnector(apiKey: "test", numberOfChoices: 2, connector: apiConnectorMock)
+        sut = DefaultGPTConnector(apiKey: "test", numberOfChoices: 2, connector: apiConnectorMock)
         
         let initialChat = Chat(
             messages: [
@@ -117,7 +117,7 @@ final class GPTConnectorTests: XCTestCase {
             }
 
         }
-        sut = GPTConnector(apiKey: "test", connector: apiConnectorMock)
+        sut = DefaultGPTConnector(apiKey: "test", connector: apiConnectorMock)
         let inputChat = Chat(messages: [.system("Hello World!")])
 
         let functionCallback: ((String, String) async throws -> String) = { name, arguments in
@@ -177,7 +177,7 @@ final class GPTConnectorTests: XCTestCase {
             }
 
         }
-        sut = GPTConnector(apiKey: "test", connector: apiConnectorMock)
+        sut = DefaultGPTConnector(apiKey: "test", connector: apiConnectorMock)
         let inputChat = Chat(messages: [.system("Hello World!")])
 
         // when
@@ -231,7 +231,7 @@ final class GPTConnectorTests: XCTestCase {
             }
 
         }
-        sut = GPTConnector(apiKey: "test", connector: apiConnectorMock)
+        sut = DefaultGPTConnector(apiKey: "test", connector: apiConnectorMock)
         let inputChat = Chat(messages: [.system("Hello World!")])
 
         let functionCallback: ((String, String) async throws -> String) = { name, arguments in
@@ -301,7 +301,7 @@ final class GPTConnectorTests: XCTestCase {
             }
 
         }
-        sut = GPTConnector(apiKey: "test", connector: apiConnectorMock)
+        sut = DefaultGPTConnector(apiKey: "test", connector: apiConnectorMock)
         let inputChat = Chat(messages: [.system("Hello World!")])
 
         let functionCallback: ((String, String) async throws -> String) = { name, arguments in
@@ -371,7 +371,7 @@ final class GPTConnectorTests: XCTestCase {
             }
 
         }
-        sut = GPTConnector(apiKey: "test", connector: apiConnectorMock)
+        sut = DefaultGPTConnector(apiKey: "test", connector: apiConnectorMock)
         let inputChat = Chat(messages: [.system("Hello World!")])
 
         var functionCallbackNumber = 0
@@ -409,7 +409,7 @@ final class GPTConnectorTests: XCTestCase {
                 usage: .init(total_tokens: 100)
             )
         }
-        sut = GPTConnector(numberOfChoices: 2, connector: apiConnectorMock)
+        sut = DefaultGPTConnector(numberOfChoices: 2, connector: apiConnectorMock)
         
         let initialChat = Chat(
             messages: [
@@ -447,7 +447,7 @@ final class GPTConnectorTests: XCTestCase {
                 usage: .init(total_tokens: 100)
             )
         }
-        sut = GPTConnector(numberOfChoices: 2, connector: apiConnectorMock)
+        sut = DefaultGPTConnector(numberOfChoices: 2, connector: apiConnectorMock)
         
         sut.apiKey = "TEST"
         

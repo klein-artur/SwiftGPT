@@ -5,7 +5,7 @@ public enum GPTConnectorError: Error {
     case apiKeyMissing
 }
 
-public protocol GPTConnectorProtocol {
+public protocol GPTConnector {
     
     var apiKey: String? { get set }
     
@@ -25,7 +25,7 @@ public protocol GPTConnectorProtocol {
     ) async throws -> [Chat]
 }
 
-public extension GPTConnectorProtocol {
+public extension GPTConnector {
     func chat(
         context: Chat,
         onChoiceSelect: @escaping (([Message], Chat) -> Message) = { (choices, _) in choices[0] },
@@ -36,7 +36,7 @@ public extension GPTConnectorProtocol {
 }
 
 /// A connector to the OpenAI API Chat completion.
-public struct GPTConnector: GPTConnectorProtocol {
+public struct DefaultGPTConnector: GPTConnector {
     public var apiKey: String? {
         didSet {
             connector.apiKey = apiKey
