@@ -14,11 +14,11 @@ import GPTConnector
 Then create a connector instance with your API Key from the OpenAI api.
 
 ```swift
-let connector = GPTConnector(apiKey: YOUR_API_KEY)
+let connector = GPTConnectorFactory.create(apiKey: YOUR_API_KEY)
 
 // alternatively you can also pass the number of choices you want to receive, default is 1.
 
-let connector = GPTConnector(apiKey: YOUR_API_KEY, numberOfChoices: 5)
+let connector = GPTConnectorFactory.create(apiKey: YOUR_API_KEY, numberOfChoices: 5)
 ```
 
 Number of choices is the alternative results the api will return.
