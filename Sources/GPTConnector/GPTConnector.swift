@@ -27,11 +27,23 @@ public protocol GPTConnector {
 
 public extension GPTConnector {
     func chat(
-        context: Chat,
-        onChoiceSelect: @escaping (([Message], Chat) -> Message) = { (choices, _) in choices[0] },
-        onFunctionCall: @escaping ((String, String) async throws -> String) = { (_, _) in throw GPTConnectorError.noFunctionHandling }
+        context: Chat
     ) async throws -> [Chat] {
-        return try await self.chat(context: context, onChoiceSelect: onChoiceSelect, onFunctionCall: onFunctionCall)
+        return try await self.chat(context: context, onChoiceSelect: { (choices, _) in choices[0] }, onFunctionCall: { (_, _) in throw GPTConnectorError.noFunctionHandling })
+    }
+    
+    func chat(
+        context: Chat,
+        onChoiceSelect: @escaping (([Message], Chat) -> Message)
+    ) async throws -> [Chat] {
+        return try await self.chat(context: context, onChoiceSelect: onChoiceSelect, onFunctionCall: { (_, _) in throw GPTConnectorError.noFunctionHandling })
+    }
+    
+    func chat(
+        context: Chat,
+        onFunctionCall: @escaping ((String, String) async throws -> String)
+    ) async throws -> [Chat] {
+        return try await self.chat(context: context, onChoiceSelect: { (choices, _) in choices[0] }, onFunctionCall: onFunctionCall)
     }
 }
 
