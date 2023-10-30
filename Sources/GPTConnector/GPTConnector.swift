@@ -59,7 +59,7 @@ public enum GPTConnectorFactory {
 }
 
 /// A connector to the OpenAI API Chat completion.
-struct DefaultGPTConnector: GPTConnector {
+class DefaultGPTConnector: GPTConnector {
     public var apiKey: String? {
         didSet {
             connector.apiKey = apiKey
