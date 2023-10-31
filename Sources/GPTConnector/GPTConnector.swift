@@ -74,6 +74,7 @@ class DefaultGPTConnector: GPTConnector {
         
         let sessionConfig = URLSessionConfiguration.default
         sessionConfig.timeoutIntervalForRequest = 300.0
+        sessionConfig.timeoutIntervalForResource = 600.0
         
         self.connector = OpenAIApiConnector(apiKey: apiKey, session: .init(configuration: sessionConfig))
     }
