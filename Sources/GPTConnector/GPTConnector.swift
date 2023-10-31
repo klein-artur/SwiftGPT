@@ -71,7 +71,11 @@ class DefaultGPTConnector: GPTConnector {
     init(apiKey: String? = nil, numberOfChoices: Int = 1) {
         self.apiKey = apiKey
         self.numberOfChoices = numberOfChoices
-        self.connector = OpenAIApiConnector(apiKey: apiKey, session: .shared)
+        
+        let sessionConfig = URLSessionConfiguration.default
+        sessionConfig.timeoutIntervalForRequest = 300.0
+        
+        self.connector = OpenAIApiConnector(apiKey: apiKey, session: .init(configuration: sessionConfig))
     }
     
     init(apiKey: String? = nil, numberOfChoices: Int = 1, connector: OpenAIApiConnector) {
