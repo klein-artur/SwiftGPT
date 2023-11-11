@@ -42,7 +42,7 @@ public class Chat: BaseModel {
     ///  - functionCall: The instruction on how to handle function calls.
     ///  - tokenCount: The token count this chat has already taken.
     public init(
-        model: String = "gpt-4",
+        model: String = "gpt-4-1106-preview",
         messages: [Message],
         temperature: Float = 0.7,
         functions: [Function] = [],
