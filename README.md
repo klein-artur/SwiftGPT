@@ -33,7 +33,7 @@ var currentChat = Chat(messages: [
 
 // You have to provide at least one message. Either a system or a user message. You can also prefill the chat if you want to give context.
 
-currentChat = connector.chat(context: currentChat).first! // chat will return an array of possible chat outcomes that will fit `numberOfChoices` which is by default 1.
+currentChat = connector.chat(context: currentChat) // chat will return an updated chat object with the messages added while running the chat.
 
 let userInput = getTheUserInput()
 
@@ -41,7 +41,7 @@ currentChat = currentChat.byAddingMessage(.user(userInput())
 
 // get the next message from the model:
 
-currentChat = connector.chat(context: currentChat).first!
+currentChat = connector.chat(context: currentChat)
 
 ```
 
@@ -52,14 +52,14 @@ The model has some default values, so usually you just have to fill it with mess
 
 ```
 Parameters:
-model: String = "gpt-4",
+model: String = "gpt-4-1106-preview",
 messages: [Message],
 temperature: Float = 0.7,
 functions: [Function] = [],
 functionCall: FunctionCallInstruction = .auto
 ```
 
-By default the context will be using the model GPT4 but you can use any chat model OpenAI is providing.
+By default the context will be using the model "gpt-4-1106-preview" but you can use any chat model OpenAI is providing.
 
 ### Function Calling:
 
@@ -115,7 +115,8 @@ currentChat = connector.chat(
 
 ```
 
-If `numberOfChoices` was set to more than one, you also might want to pass the parameter `onChoiceSelect` to select which choice should be taken. It's possible that not every choice is a function call. If you select a choice that is no functionc all the method will return the choices as a result.
+If `numberOfChoices` was set to more than one, you also might want to pass the parameter `messageReceivedCallback` to select which choice should be taken.
+The callback is called on every chat interaction but if not passed it will by default always choose the first choice.
 
 ```swift
 chat(
