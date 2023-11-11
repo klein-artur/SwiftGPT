@@ -68,10 +68,8 @@ final class GPTConnectorTests: XCTestCase {
         let result = try await sut.chat(context: initialChat)
         
         // then
-        XCTAssertEqual(result.count, 2)
-        XCTAssertEqual(result[0].messages.count, 2)
-        XCTAssertEqual(result[0].messages[1].content, "hello!")
-        XCTAssertEqual(result[1].messages[1].content, "hi!")
+        XCTAssertEqual(result.messages.count, 2)
+        XCTAssertEqual(result.messages[1].content, "hello!")
         XCTAssertEqual(apiConnectorMock.lastNumberOfChoicesCall, 2)
     }
     
@@ -130,9 +128,8 @@ final class GPTConnectorTests: XCTestCase {
         let result = try await sut.chat(context: inputChat, onFunctionCall: functionCallback)
 
         // then
-        XCTAssertEqual(result.count, 1)
-        XCTAssertEqual(result[0].messages.count, 4)
-        XCTAssertEqual(result[0].messages[3].content, "function result")
+        XCTAssertEqual(result.messages.count, 4)
+        XCTAssertEqual(result.messages[3].content, "function result")
     }
     
     func testShouldFunctionCall_noFunctionHandler() async throws {
@@ -239,18 +236,26 @@ final class GPTConnectorTests: XCTestCase {
             XCTAssertEqual(arguments, "{}")
             return "function result"
         }
+        
+        var mrCounter = 0
+        let messageReceivedCallback: ([Message], Chat) -> Message = { messages, _ in
+            mrCounter += 1
+            switch mrCounter {
+            case 1: return messages[1]
+            default: return messages[0]
+            }
+        }
 
         // when
         let result = try await sut.chat(
             context: inputChat,
-            onChoiceSelect: { messages, _ in messages[1] },
+            onMessagesReceived: messageReceivedCallback,
             onFunctionCall: functionCallback
         )
 
         // then
-        XCTAssertEqual(result.count, 1)
-        XCTAssertEqual(result[0].messages.count, 4)
-        XCTAssertEqual(result[0].messages[3].content, "function result")
+        XCTAssertEqual(result.messages.count, 4)
+        XCTAssertEqual(result.messages[3].content, "function result")
     }
     
     func testShouldFunctionCallWithoutResult_choiceNoFunc() async throws {
@@ -309,18 +314,26 @@ final class GPTConnectorTests: XCTestCase {
             XCTAssertEqual(arguments, "{}")
             return "function result"
         }
+        
+        var mrCounter = 0
+        let messageReceivedCallback: ([Message], Chat) -> Message = { messages, _ in
+            mrCounter += 1
+            switch mrCounter {
+            case 1: return messages[2]
+            default: return messages[0]
+            }
+        }
 
         // when
         let result = try await sut.chat(
             context: inputChat,
-            onChoiceSelect: { messages, _ in messages[2] },
+            onMessagesReceived: messageReceivedCallback,
             onFunctionCall: functionCallback
         )
 
         // then
-        XCTAssertEqual(result.count, 3)
-        XCTAssertEqual(result[2].messages.count, 2)
-        XCTAssertEqual(result[2].messages[1].content, "some test answer 1")
+        XCTAssertEqual(result.messages.count, 2)
+        XCTAssertEqual(result.messages[1].content, "some test answer 1")
     }
 
     func testShouldMultipleFunctionCallWithResult() async throws {
@@ -396,9 +409,8 @@ final class GPTConnectorTests: XCTestCase {
         let result = try await sut.chat(context: inputChat, onFunctionCall: functionCallback)
 
         // then
-        XCTAssertEqual(result.count, 1)
-        XCTAssertEqual(result[0].messages.count, 6)
-        XCTAssertEqual(result[0].messages[5].content, "function result2")
+        XCTAssertEqual(result.messages.count, 6)
+        XCTAssertEqual(result.messages[5].content, "function result2")
     }
     
     func testApiKeyNotSetShouldThrow() async throws {
@@ -461,10 +473,8 @@ final class GPTConnectorTests: XCTestCase {
         let result = try await sut.chat(context: initialChat)
         
         // then
-        XCTAssertEqual(result.count, 2)
-        XCTAssertEqual(result[0].messages.count, 2)
-        XCTAssertEqual(result[0].messages[1].content, "hello!")
-        XCTAssertEqual(result[1].messages[1].content, "hi!")
+        XCTAssertEqual(result.messages.count, 2)
+        XCTAssertEqual(result.messages[1].content, "hello!")
         XCTAssertEqual(apiConnectorMock.lastNumberOfChoicesCall, 2)
     }
     
