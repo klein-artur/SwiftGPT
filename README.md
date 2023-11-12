@@ -1,6 +1,6 @@
 # GPTConnector
 
-A small wrapper around the OpenAI Api for chat completions. Simple said, it's a wrapper to use GPT models in a chat manner.
+A small wrapper around the OpenAI Api for chat completions.
 
 ## Usage
 
@@ -27,9 +27,12 @@ Now if you have your instance you can start to chat with GPT.
 
 ```swift
 
-var currentChat = Chat(messages: [
-    .system("You are a helpful assistant.")
-])
+var currentChat = Chat(
+    messages: [
+        .system("You are a helpful assistant.")
+    ],
+    tools: []
+)
 
 // You have to provide at least one message. Either a system or a user message. You can also prefill the chat if you want to give context.
 
@@ -61,57 +64,57 @@ functionCall: FunctionCallInstruction = .auto
 
 By default the context will be using the model "gpt-4-1106-preview" but you can use any chat model OpenAI is providing.
 
-### Function Calling:
+### Tools Calling:
 
-Some models like gpt-4 are able to call functions if they are provided:
+Some models like gpt-4 are able to call tools if they are provided:
 
 ```swift
-Chat(
-    messages: [
-        .system("Test Message")
-    ],
-    functions: [
-        Function(
-            name: "some_function",
-            description: "The description for the model.",
-            parameters: [
-                Function.Property(
-                    name: "property_name",
-                    type: .boolean,
-                    description: "The description of the parameter.",
-                    required: true
-                ),
-                Function.Property(
-                    name: "property_name",
-                    type: .integer,
-                    description: "The description of the parameter.",
-                    required: false
-                ),
-                Function.Property(
-                    name: "property_name",
-                    type: .string,
-                    description: "The description of the parameter.",
-                    required: true
-                )
-            ]
+let chat = Chat(
+    messages: [.system("Test Message")],
+    tools: [
+        Tool(
+            function: Function(
+                name: "some_function",
+                description: "The description for the model.",
+                parameters: [
+                    Function.Property(
+                        name: "boolean_name",
+                        type: .boolean,
+                        description: "The description of the parameter.",
+                        required: true
+                    ),
+                    Function.Property(
+                        name: "integer_name",
+                        type: .integer,
+                        description: "The description of the parameter.",
+                        required: false
+                    ),
+                    Function.Property(
+                        name: "string_name",
+                        type: .string,
+                        description: "The description of the parameter.",
+                        required: true
+                    )
+                ]
+            )
         )
     ]
 )
 ```
 
-In this example we pass three functions to the model. If it decides to call a function you have to pass at least the callback `onFunctionCall` to handle the call and return the a result to the model.
+In this example we pass three functions to the model. If it decides to call a function you have to pass at least the callback `onToolCall` to handle the call and return the a result to the model.
 
 ```swift
 
 currentChat = connector.chat(
     context: currentChat,
-    onFunctionCall: { functionName, arguments in
-        switch functionName {
+    onToolCall: { call in
+        switch call.function.name {
         case "some_function": return "some function result"
         default: throw .functionNotKnown
         }
     }
-).first!
+)
 
 ```
 
@@ -121,11 +124,11 @@ The callback is called on every chat interaction but if not passed it will by de
 ```swift
 chat(
     context: initialChat,
-    onChoiceSelect: { messages, currentContext in
+    messageReceivedCallback: { messages, currentContext in
         /// currentContext is the Chat at the moment the choice needs to be done.
         return messages[2]
     },
-    onFunctionCall: { functionName, arguments in
+    onToolCall: { call in
         return "the function result"
     }
 )

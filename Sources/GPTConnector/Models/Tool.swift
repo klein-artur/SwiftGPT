@@ -15,7 +15,7 @@ public class Tool: BaseModel {
     public let type: ToolType
     public let function: Function
     
-    init(type: ToolType = .function, function: Function) {
+    public init(type: ToolType = .function, function: Function) {
         self.type = type
         self.function = function
     }
