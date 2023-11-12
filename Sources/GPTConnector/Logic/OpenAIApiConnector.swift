@@ -36,6 +36,17 @@ class OpenAIApiConnector {
         let messages: [MessageData]
         let functions: [Function]?
         let function_call: String?
+        let tools: [Tool]?
+        let tool_choice: String?
+        
+        struct Tool: Codable {
+            enum ToolType: String, Codable {
+                case function
+            }
+
+            let type: ToolType
+            let function: Function
+        }
         
         struct MessageData: Codable {
             
@@ -44,16 +55,31 @@ class OpenAIApiConnector {
                 case content
                 case function_call
                 case name
+                case tool_calls
+                case tool_call_id
             }
             
             let role: Message.Role
             let content: String?
             let function_call: FunctionCall?
+            let tool_calls: [ToolCall]?
             let name: String?
+            let tool_call_id: String?
             
             struct FunctionCall: Codable {
                 let name: String
                 let arguments: String
+            }
+            
+            struct ToolCall: Codable {
+                let id: String
+                let type: ChatData.Tool.ToolType
+                let function: Function
+                
+                struct Function: Codable {
+                    let name: String
+                    let arguments: String
+                }
             }
             
             func encode(to encoder: Encoder) throws {

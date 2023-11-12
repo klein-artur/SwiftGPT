@@ -20,24 +20,47 @@ extension Chat {
         case let .forced(name):
             functionCall = "{\"name\": \"\(name)\"}"
         }
+        
+        let toolChoice: String?
+        switch self.toolChoice {
+        case .none:
+            toolChoice = "none"
+        case .auto:
+            toolChoice = nil
+        case let .forced(name):
+            toolChoice = "{\"type: \"function\", \"function\": {\"name\": \"\(name)\"}}"
+        }
         return .init(
             model: self.model,
             temperature: self.temperature,
             messages: messages.messageDatas,
             functions: functions.isEmpty ? nil : functions.functionDatas,
-            function_call: functionCall
+            function_call: functionCall,
+            tools: tools.isEmpty ? nil : tools.toolDatas,
+            tool_choice: toolChoice
         )
     }
 }
 
 extension OpenAIApiConnector.ChatData {
     var chat: Chat {
-        .init(
-            model: self.model,
-            messages: self.messages.messages,
-            temperature: self.temperature,
-            functions: self.functions?.functions ?? []
-        )
+        let isUsingDeprecatedMode = self.functions != nil && self.functions?.isEmpty != true
+        
+        if isUsingDeprecatedMode {
+            return .init(
+                model: self.model,
+                messages: self.messages.messages,
+                temperature: self.temperature,
+                functions: self.functions?.functions ?? []
+            )
+        } else {
+            return .init(
+                model: self.model,
+                messages: self.messages.messages,
+                temperature: self.temperature,
+                tools: self.tools?.tools ?? []
+            )
+        }
     }
 }
 
@@ -49,7 +72,9 @@ extension Message {
             role: self.role,
             content: self.content,
             function_call: self.functionCall?.functionCallData,
-            name: self.name
+            tool_calls: self.toolCalls.toolCallDatas.isEmpty ? nil : self.toolCalls.toolCallDatas,
+            name: self.name,
+            tool_call_id: self.toolCallId
         )
     }
 }
@@ -62,12 +87,24 @@ extension Array where Element == Message {
 
 extension OpenAIApiConnector.ChatData.MessageData {
     var message: Message {
-        .init(
-            role: self.role,
-            content: self.content,
-            functionCall: self.function_call?.functionCall,
-            name: self.name
-        )
+        let usesDeprecationMode: Bool = self.function_call != nil
+        
+        if usesDeprecationMode {
+            return .init(
+                role: self.role,
+                content: self.content,
+                functionCall: self.function_call?.functionCall,
+                name: self.name
+            )
+        } else {
+            return .init(
+                role: self.role,
+                content: self.content,
+                toolCalls: self.tool_calls?.toolCalls ?? [],
+                name: self.name,
+                toolCallId: self.tool_call_id
+            )
+        }
     }
 }
 
@@ -146,5 +183,66 @@ extension Array where Element == Function {
 extension Array where Element == OpenAIApiConnector.ChatData.Function {
     var functions: [Function] {
         self.map { $0.function }
+    }
+}
+
+// MARK: Tools <-> Tools Data
+
+extension Tool {
+    var toolData: OpenAIApiConnector.ChatData.Tool {
+        .init(
+            type: OpenAIApiConnector.ChatData.Tool.ToolType(rawValue: self.type.rawValue)!,
+            function: self.function.functionData
+        )
+    }
+}
+
+extension Array where Element == Tool {
+    var toolDatas: [OpenAIApiConnector.ChatData.Tool] {
+        self.map { $0.toolData }
+    }
+}
+
+extension OpenAIApiConnector.ChatData.Tool {
+    var tool: Tool {
+        .init(type: Tool.ToolType(rawValue: self.type.rawValue)!, function: self.function.function)
+    }
+}
+
+extension Array where Element == OpenAIApiConnector.ChatData.Tool {
+    var tools: [Tool] {
+        map { $0.tool }
+    }
+}
+
+extension ToolCall {
+    var toolCallData: OpenAIApiConnector.ChatData.MessageData.ToolCall {
+        .init(
+            id: self.id,
+            type: OpenAIApiConnector.ChatData.Tool.ToolType.init(rawValue: self.type.rawValue)!,
+            function: OpenAIApiConnector.ChatData.MessageData.ToolCall.Function(name: self.function.name, arguments: self.function.arguments)
+        )
+    }
+}
+
+extension Array where Element == ToolCall {
+    var toolCallDatas: [OpenAIApiConnector.ChatData.MessageData.ToolCall] {
+        map { $0.toolCallData }
+    }
+}
+
+extension OpenAIApiConnector.ChatData.MessageData.ToolCall {
+    var toolCall: ToolCall {
+        .init(
+            id: self.id,
+            type: ToolCall.ToolType(rawValue: self.type.rawValue)!,
+            function: ToolCall.Function(name: self.function.name, arguments: self.function.arguments)
+        )
+    }
+}
+
+extension Array where Element == OpenAIApiConnector.ChatData.MessageData.ToolCall {
+    var toolCalls: [ToolCall] {
+        map { $0.toolCall }
     }
 }
