@@ -107,7 +107,6 @@ public class Message: BaseModel, Codable {
     /// Creates a new assistant message.
     /// - Parameter content: The content of the message.
     /// - Parameter toolCalls: The toolCalls to call.
-    @available(*, deprecated, message: "Use the version with Tool Call instead.")
     public static func assistant(_ content: String?, toolCalls: [ToolCall]) -> Message {
         return Message(role: .assistant, content: content, toolCalls: toolCalls, name: nil, toolCallId: nil)
     }
