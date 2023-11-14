@@ -10,13 +10,13 @@ import Foundation
 public class Chat: BaseModel {
     
     @available(*, deprecated, message: "Use ToolChoice instead.")
-    public enum FunctionCallInstruction {
+    public enum FunctionCallInstruction: Equatable {
         case none
         case auto
         case forced(name: String)
     }
     
-    public enum ToolChoice {
+    public enum ToolChoice: Equatable {
         case none
         case auto
         case forced(name: String)
@@ -48,7 +48,7 @@ public class Chat: BaseModel {
     /// The instruction how to handle tool calls.
     public var toolChoice: ToolChoice
     
-    private let deprecationMode: Bool
+    let deprecationMode: Bool
     
     /// Creates a new chat.
     /// - Parameters:

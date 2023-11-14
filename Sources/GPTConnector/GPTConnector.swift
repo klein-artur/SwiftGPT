@@ -201,12 +201,22 @@ public extension Chat {
         var messages = self.messages
         messages.append(message)
         
-        return .init(
-            model: self.model,
-            messages: messages,
-            temperature: self.temperature,
-            functions: self.functions,
-            functionCall: self.functionCall
-        )
+        if self.deprecationMode {
+            return .init(
+                model: self.model,
+                messages: messages,
+                temperature: self.temperature,
+                functions: self.functions,
+                functionCall: self.functionCall
+            )
+        } else {
+            return .init(
+                model: self.model,
+                messages: messages,
+                temperature: self.temperature,
+                tools: self.tools,
+                toolChoice: self.toolChoice
+            )
+        }
     }
 }
